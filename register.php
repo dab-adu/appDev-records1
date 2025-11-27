@@ -13,6 +13,7 @@ if(isset($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['pas
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $student_number = generateStudentNumber();
 
+    // Ensure username is unique
     $stmt_check = $conn->prepare("SELECT * FROM users WHERE username = :username");
     $stmt_check->bindParam(':username', $student_number);
     $stmt_check->execute();
@@ -22,19 +23,19 @@ if(isset($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['pas
         $stmt_check->execute();
     }
 
-    $course_stmt = $conn->query("SELECT id FROM courses ORDER BY RAND() LIMIT 1");
-    $course_id = $course_stmt->fetchColumn();
+    $program_stmt = $conn->query("SELECT id FROM programs ORDER BY RAND() LIMIT 1");
+    $program_id = $program_stmt->fetchColumn();
 
     $stmt = $conn->prepare("
-        INSERT INTO users (username, first_name, last_name, email, password, course_id)
-        VALUES (:username, :first_name, :last_name, :email, :password, :course_id)
+        INSERT INTO users (username, first_name, last_name, email, password, program_id)
+        VALUES (:username, :first_name, :last_name, :email, :password, :program_id)
     ");
     $stmt->bindParam(':username', $student_number);
     $stmt->bindParam(':first_name', $first_name);
     $stmt->bindParam(':last_name', $last_name);
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':password', $password);
-    $stmt->bindParam(':course_id', $course_id);
+    $stmt->bindParam(':program_id', $program_id);
 
     if($stmt->execute()){
         $_SESSION['student_number'] = $student_number;
@@ -45,5 +46,4 @@ if(isset($_POST['first_name'], $_POST['last_name'], $_POST['email'], $_POST['pas
         echo "Error registering user.";
     }
 }
-
 ?>
