@@ -17,23 +17,23 @@ $types_stmt = $conn->prepare("SELECT * FROM record_types");
 $types_stmt->execute();
 $types = $types_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$currentCourseStmt = $conn->prepare("
-    SELECT c.course_name, c.id 
+$currentProgramStmt = $conn->prepare("
+    SELECT p.program_name, p.id 
     FROM users u
-    JOIN courses c ON u.course_id = c.id
+    JOIN programs p ON u.program_id = p.id
     WHERE u.username = ?
 ");
-$currentCourseStmt->execute([$user_id]);
-$currentCourse = $currentCourseStmt->fetch(PDO::FETCH_ASSOC);
+$currentProgramStmt->execute([$user_id]);
+$currentProgram = $currentProgramStmt->fetch(PDO::FETCH_ASSOC);
 
-$otherCoursesStmt = $conn->prepare("
-    SELECT id, course_name 
-    FROM courses 
+$otherProgramsStmt = $conn->prepare("
+    SELECT id, program_name 
+    FROM programs 
     WHERE id != ?
-    ORDER BY course_name ASC
+    ORDER BY program_name ASC
 ");
-$otherCoursesStmt->execute([$currentCourse['id']]);
-$otherCourses = $otherCoursesStmt->fetchAll(PDO::FETCH_ASSOC);
+$otherProgramsStmt->execute([$currentProgram['id']]);
+$otherPrograms = $otherProgramsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -117,15 +117,15 @@ $otherCourses = $otherCoursesStmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Current Program</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($currentCourse['course_name']); ?>" disabled>
+                        <input type="text" class="form-control" value="<?= htmlspecialchars($currentProgram['program_name']); ?>" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Choose New Program</label>
                         <select class="form-select">
                             <option value="">-- Select Program --</option>
-                            <?php foreach ($otherCourses as $course): ?>
-                                <option value="<?= $course['id']; ?>"><?= htmlspecialchars($course['course_name']); ?></option>
+                            <?php foreach ($otherPrograms as $program): ?>
+                                <option value="<?= $program['id']; ?>"><?= htmlspecialchars($program['program_name']); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
